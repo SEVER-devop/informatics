@@ -1,0 +1,56 @@
+import random
+
+
+def mat_infill() -> list:
+    mat = []
+
+    try:
+        n = int(input("Введите ширину квадратной матрицы "))
+    except:
+        print(f"Введено не верное значение n = {n}")
+        exit()
+
+    if n < 1:
+        print(f"Введено не верное значение n = {n}")
+        exit()
+
+
+    for i in range(n):
+        line = [random.randint(2, 4) for _ in range(n)]
+        mat.append(line)
+    
+    if n % 2 == 0:
+        print(f"Полученна четная матрица {n}x{n} =")
+        for i in mat:
+            print(i)
+        exit()
+
+    print(f"Полученная нечетная матрица {n}x{n} =")
+    for i in mat:
+        print(i)
+
+    return mat
+
+def mat_change(mat) -> list:
+    num_str = -1
+    for i in range(len(mat) // 2, len(mat)):
+        num_str += 1
+        wid = 1 + num_str * 2
+        for j in range(wid // 2 + 1):
+            if j == 0:
+                mat[i][len(mat[0]) // 2 + j] = (mat[i][len(mat[0]) // 2 + j])**2
+            else:
+                mat[i][len(mat[0]) // 2 + j] = (mat[i][len(mat[0]) // 2 + j])**2
+                mat[i][len(mat[0]) // 2 - j] = (mat[i][len(mat[0]) // 2 - j])**2
+
+    print(f"Результирующая матрица =")
+    for i in mat:
+        print(i)
+    
+    return mat
+
+mat = mat_infill()
+#mat = [[2, 4, 3], [4, 5, 2], [2, 3, 3]]
+#mat = [[1, 2, 3, 4, 5], [6, 7, 8, 9, 10], [11, 12, 13, 14, 15], [16, 17, 18, 19, 20], [21, 22, 23, 24, 25]]
+
+mat_change(mat)
