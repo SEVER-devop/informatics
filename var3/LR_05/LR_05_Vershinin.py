@@ -28,7 +28,7 @@ def window() -> None:
     Button(text="Второе задание", command=cmd_second_var).place(x=80, y=110)
     Button(text="Использовать рандомно\n сгенерированные значения",
             command=lambda: infill_matrix(1)).place(x=40, y=150)
-    Button(text="Использовать pначения\n из задания",
+    Button(text="Использовать значения\n из задания",
             command=lambda: infill_matrix(0)).place(x=55, y=205)
     Button(text="Вычислить", command=cmd_btn_calc).place(x=95, y=260)
 
