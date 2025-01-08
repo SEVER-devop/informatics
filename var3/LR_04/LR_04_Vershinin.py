@@ -70,7 +70,7 @@ def show(ans, mat) -> None:
             l2.pack()
             values = []
             for i, lines in enumerate(ans):
-                 for j in range(len(mat)):
+                for j in range(len(mat)):
                     if lines[0] in mat[j]:
                         values.append([j + 1, len(lines), lines])
         else:
@@ -107,8 +107,8 @@ def error(er) -> None:
 ttk.Button(text='rest', command=rst).pack(anchor=NE, padx=10, pady=10)
 Label(text="Лабораторная работа №4 \n Вершинин Сергей \n АТ-24-01", borderwidth=10, relief="ridge").pack()
 # Для вывода картинки с заданием необходимо убрать комментарии и изменить путь к файлу
-img2 = ImageTk.PhotoImage(Image.open("python/learning/infa/var3/LR_04/shot.png").resize((600, 175)))
-Label(win, image = img2).pack()
+# img2 = ImageTk.PhotoImage(Image.open("python/learning/infa/var3/LR_04/shot.png").resize((600, 175)))
+# Label(win, image = img2).pack()
 
 Label(text="Введите интервал через пробел").pack()
 btn1 = ttk.Button(text="Подтвердить", command=btn1)
