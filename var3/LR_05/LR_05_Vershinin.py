@@ -6,6 +6,8 @@ import random
 from PIL import Image, ImageTk
 
 def window() -> None:
+    global data_for_save
+    data_for_save = []
     win.config(cursor="dot red")
     win.geometry("900x950")
     win.title("Лабораторная работа №5 Вершинин")
@@ -68,6 +70,62 @@ def error(err) -> None:
     Label(err_win, text=err).pack()
 
 
+def list_to_str_convert(val, name) -> list:
+    res = f"{name}\n"
+    if type(val) is int or type(val) is float:
+            res += str(val) +"\n\n"
+    if type(val) is bool:
+        if val:
+            res += "True \n\n"
+        else:
+            res += "False \n\n"
+    elif type(val[0]) is list:
+        for i in range(len(val)):
+            for j in val[i]:
+                res += str(j) + " "
+            res += "\n"
+    else:
+        for i in val:
+            res += str(i) + ' '
+        res += "\n"
+    res += "\n"
+
+    return res
+
+
+def save_info(values) -> None:
+    global data_for_save
+    if var_status == 1:
+        names = ["Vector X",
+                 "Vector Y",
+                 "Vector Z",
+                 "Vector P",
+                 "X*Y",
+                 "Z*P",
+                 "Check_dot_prod"]
+        file_name = "LR_05_number_1_Vershinin.txt"
+    else:
+        names = ["Matrix A",
+                 "Matrix B",
+                 "Matrix C",
+                 "Transp Matrix A",
+                 "Symmetric checker A",
+                 "Transp Matrix B",
+                 "Symmetric checker B",
+                 "Transp Matrix C",
+                 "Symmetric checker C"]
+        file_name = "LR_05_number_2_Vershinin.txt"
+
+    data = []
+    for i in range(len(values)):
+        data.append(list_to_str_convert(values[i], names[i]))
+
+    with open(file_name, 'w+') as f:
+        f.writelines(data)
+
+    data_for_save = []
+
+
 def cmd_btn_calc() -> None:
     try:
         var_status == array
@@ -82,6 +140,10 @@ def cmd_btn_calc() -> None:
         second_prod = dot_product([array[2],array[3]])
         ans = [first_prod, second_prod, 
                 check_dot_product([first_prod, second_prod])]
+        for i in range(4):
+            data_for_save.append(array[i])
+        for i in ans:
+            data_for_save.append(i)
         
     else:
         first_matrix = [transposition(array[0]),
@@ -91,8 +153,14 @@ def cmd_btn_calc() -> None:
         third_matrix = [transposition(array[2]),
                         symmetry_checker(transposition(array[2]))]
         ans = [first_matrix, second_matrix, third_matrix]
+        for i in range(3):
+            data_for_save.append(array[i])
+        for i in ans:
+            for j in i:
+                data_for_save.append(j)
     
     show_answer(ans)
+    save_info(data_for_save)
 
 
 def infill_matrix(gen_type) -> None:
@@ -160,7 +228,6 @@ def show_answer(answer) -> None:
             for j in range(len(answer[i][0])):
                 Label(frame2, text=answer[i][0][j]).grid(row=j+4, column=i, padx=12)
         
-
 
 def show_values(values) -> None:
     global frame1

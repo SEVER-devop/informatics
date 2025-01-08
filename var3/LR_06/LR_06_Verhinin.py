@@ -1,7 +1,6 @@
 from tkinter import *
 import tkinter.ttk as ttk
 from math import *
-import random
 
 from PIL import Image, ImageTk
 
@@ -26,11 +25,7 @@ def window() -> None:
     Button(text="reset", background="red", command=cmd_rst).place(x=15, y=15)
     Button(text="Вычислить", command=cmd_btn_calc).place(x=110, y=30)
     try:
-        img1 = ImageTk.PhotoImage(
-            Image.open("python/informatics/" + "var3/LR_06/number_6.png").resize(
-                (400, 300)
-            )
-        )
+        img1 = ImageTk.PhotoImage(Image.open("number_6.png").resize((400, 300)))
 
         Label(win, image=img1).place(x=370, y=100)
     except:
@@ -48,7 +43,7 @@ def disp_info(values) -> None:
         val = []
         for j in values[0][i]:
             val.append(round(j, accuracy))
-        Label(frame1, text=val).grid(row=i+2, column=2, pady=10)
+        Label(frame1, text=val).grid(row=i + 2, column=2, pady=10)
 
     frame2 = Frame()
     frame2.place(x=15, y=480)
@@ -57,26 +52,71 @@ def disp_info(values) -> None:
         val = []
         for j in values[1][0][i]:
             val.append(round(j, accuracy))
-        Label(frame2, text=val).grid(row=i+2, column=2, pady=10)
-    
+        Label(frame2, text=val).grid(row=i + 2, column=2, pady=10)
+
     frame3 = Frame()
     frame3.place(x=300, y=490)
-    Label(frame3, text="Среднее значение строк исходной матрицы").grid(row=1, column=2, columnspan=9)
+    Label(frame3, text="Среднее значение строк исходной матрицы").grid(
+        row=1, column=2, columnspan=9
+    )
     for i in range(len(values[1][1])):
-        Label(frame3, text=round(values[1][1][i], accuracy)).grid(row=2, column=i+2, pady=15)
+        Label(frame3, text=round(values[1][1][i], accuracy)).grid(
+            row=2, column=i + 2, pady=15
+        )
 
     frame4 = Frame()
     frame4.place(x=300, y=590)
     Label(frame4, text="Вектор X").grid(row=1, column=2, columnspan=9)
     for i in range(len(values[2])):
-        Label(frame4, text=round(values[2][i], accuracy)).grid(row=2, column=i+2, pady=15)
-
+        Label(frame4, text=round(values[2][i], accuracy)).grid(
+            row=2, column=i + 2, pady=15
+        )
 
     frame5 = Frame()
     frame5.place(x=300, y=690)
     Label(frame5, text="Отсортированный вектор X").grid(row=1, column=2, columnspan=9)
     for i in range(len(values[3])):
-        Label(frame5, text=round(values[3][i], accuracy)).grid(row=2, column=i+2, pady=15)
+        Label(frame5, text=round(values[3][i], accuracy)).grid(
+            row=2, column=i + 2, pady=15
+        )
+
+
+def list_to_str_convert(val, name) -> list:
+    res = f"{name}\n"
+    if isinstance(val[0], list):
+        for i in range(len(val)):
+            for j in val[i]:
+                res += str(j) + " "
+            res += "\n"
+    else:
+        for i in val:
+            res += str(i) + ' '
+        res += "\n"
+    res += "\n"
+
+    return res
+
+
+def save_info(values) -> None:
+    names = ["Matrix",
+                [
+                "Resulting matrix",
+                "Average value of the row elements of the matrix"
+                ],
+            "Vector X",
+            "Sorted Vector X"
+            ]
+    data = []
+    for i in range(len(values)):
+        if i == 1:
+            for j in range(2):
+                data.append(list_to_str_convert(values[i][j], names[i][j]))
+        else:
+            data.append(list_to_str_convert(values[i], names[i]))
+
+    with open('LR_06_Vershinin.txt', 'w+') as f:
+        f.writelines(data)
+
 
 def cmd_btn_calc():
     matrix = matrix_infill()
@@ -84,8 +124,8 @@ def cmd_btn_calc():
     vector_x = third_number(second_answer[0])
     vector_x_sort = fourth_number(vector_x)
     disp_info([matrix, second_answer, vector_x, vector_x_sort])
+    save_info([matrix, second_answer, vector_x, vector_x_sort])
 
-        
 
 def cmd_rst():
     try:
@@ -96,6 +136,8 @@ def cmd_rst():
         frame5.destroy()
     except:
         pass
+
+
 
 def error(err) -> None:
     err_win = Toplevel(win)
@@ -124,7 +166,7 @@ def second_number(mat) -> list:
         average_str = 0
         for j in i:
             average_str += j
-        average_mat.append(average_str/9)
+        average_mat.append(average_str / 9)
 
     # Перестановка 3го и 7го столбца
     for i in range(9):
@@ -150,8 +192,6 @@ def fourth_number(vector) -> list:
                 vec[j], vec[j + 1] = vec[j + 1], vec[j]
 
     return vec
-
-
 
 
 win = Tk()
