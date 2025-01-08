@@ -38,7 +38,7 @@ def disp_info(values) -> None:
     global frame1, frame2, frame3, frame4, frame5
     accuracy = 1
 
-    frame1 = Frame(background="gray5")
+    frame1 = Frame()
     frame1.place(x=25, y=70)
     Label(frame1, text="Исходная матрица").grid(row=1, column=1, columnspan=2)
     for i in range(len(values[0])):
@@ -47,7 +47,7 @@ def disp_info(values) -> None:
             val.append(round(j, accuracy))
         Label(frame1, text=val).grid(row=i + 2, column=2, pady=10)
 
-    frame2 = Frame(background="gray5")
+    frame2 = Frame()
     frame2.place(x=25, y=480)
     Label(frame2, text="Результирующая матрица").grid(row=1, column=1, columnspan=2)
     for i in range(len(values[1][0])):
@@ -67,7 +67,7 @@ def disp_info(values) -> None:
         )
 
     frame4 = Frame()
-    frame4.place(x=545, y=350)
+    frame4.place(x=535, y=350)
     Label(frame4, text="Вектор X").grid(row=1, column=2, columnspan=9)
     for i in range(len(values[2])):
         Label(frame4, text=round(values[2][i], accuracy)).grid(
@@ -75,7 +75,7 @@ def disp_info(values) -> None:
         )
 
     frame5 = Frame()
-    frame5.place(x=545, y=450)
+    frame5.place(x=535, y=450)
     Label(frame5, text="Отсортированный вектор X").grid(row=1, column=2, columnspan=9)
     for i in range(len(values[3])):
         Label(frame5, text=round(values[3][i], accuracy)).grid(

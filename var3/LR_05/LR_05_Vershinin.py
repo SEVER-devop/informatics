@@ -213,7 +213,7 @@ def show_answer(answer) -> None:
     else:
         names = ["A'", "B'", "C'"]
         frame2 = Frame()
-        frame2.place(x=330, y=420)
+        frame2.place(x=380, y=420)
         Label(frame2, text="Результирующие данные").grid(row=1, column=0, columnspan=3)
         for i in range(3):
             Label(frame2, text=names[i]).grid(row=2, column=i, padx=10, pady=0)
