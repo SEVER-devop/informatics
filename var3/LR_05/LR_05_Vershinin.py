@@ -74,11 +74,11 @@ def list_to_str_convert(val, name) -> list:
     res = f"{name}\n"
     if type(val) is int or type(val) is float:
             res += str(val) +"\n\n"
-    if type(val) is bool:
+    elif type(val) is bool:
         if val:
-            res += "True \n\n"
+            ret += "True"
         else:
-            res += "False \n\n"
+            res += "False"
     elif type(val[0]) is list:
         for i in range(len(val)):
             for j in val[i]:
@@ -124,7 +124,6 @@ def save_info(values) -> None:
         f.writelines(data)
 
     data_for_save = []
-
 
 def cmd_btn_calc() -> None:
     try:
