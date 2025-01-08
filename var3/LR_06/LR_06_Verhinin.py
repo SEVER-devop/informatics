@@ -7,6 +7,7 @@ from PIL import Image, ImageTk
 
 # Блок кода для Tkinter
 def window() -> None:
+    global img1
     win.config(cursor="dot red")
     win.geometry("900x950")
     win.title("Лабораторная работа №6 Вершинин")
@@ -14,20 +15,21 @@ def window() -> None:
     win.maxsize(900, 950)
     win.attributes("-alpha", 0.96)
     win.configure(background="gray12")
-    Frame(background="gray5", height="1000", width="300").pack(anchor="nw")
+    Frame(background="gray5", height="1000", width="400").pack(anchor="nw")
     Label(
         text="Вершинин Сергей \n Лабораторная работа №6",
         fg="lightsalmon1",
         font="Arial 20 bold",
         background="gray12",
-    ).place(x=440, y=15)
+    ).place(x=510, y=15)
 
     Button(text="reset", background="red", command=cmd_rst).place(x=15, y=15)
     Button(text="Вычислить", command=cmd_btn_calc).place(x=110, y=30)
     try:
-        img1 = ImageTk.PhotoImage(Image.open("number_6.png").resize((400, 300)))
+        img1 = ImageTk.PhotoImage(Image.open("python/learning/informatics/var3"
+                                + "/LR_06/number_6.png").resize((400, 100)))
 
-        Label(win, image=img1).place(x=370, y=100)
+        Label(win, image=img1).place(x=440, y=100)
     except:
         error("Для вывода картинки укажите путь в программе")
 
@@ -36,8 +38,8 @@ def disp_info(values) -> None:
     global frame1, frame2, frame3, frame4, frame5
     accuracy = 1
 
-    frame1 = Frame()
-    frame1.place(x=15, y=70)
+    frame1 = Frame(background="gray5")
+    frame1.place(x=25, y=70)
     Label(frame1, text="Исходная матрица").grid(row=1, column=1, columnspan=2)
     for i in range(len(values[0])):
         val = []
@@ -45,8 +47,8 @@ def disp_info(values) -> None:
             val.append(round(j, accuracy))
         Label(frame1, text=val).grid(row=i + 2, column=2, pady=10)
 
-    frame2 = Frame()
-    frame2.place(x=15, y=480)
+    frame2 = Frame(background="gray5")
+    frame2.place(x=25, y=480)
     Label(frame2, text="Результирующая матрица").grid(row=1, column=1, columnspan=2)
     for i in range(len(values[1][0])):
         val = []
@@ -55,7 +57,7 @@ def disp_info(values) -> None:
         Label(frame2, text=val).grid(row=i + 2, column=2, pady=10)
 
     frame3 = Frame()
-    frame3.place(x=300, y=490)
+    frame3.place(x=480, y=250)
     Label(frame3, text="Среднее значение строк исходной матрицы").grid(
         row=1, column=2, columnspan=9
     )
@@ -65,7 +67,7 @@ def disp_info(values) -> None:
         )
 
     frame4 = Frame()
-    frame4.place(x=300, y=590)
+    frame4.place(x=545, y=350)
     Label(frame4, text="Вектор X").grid(row=1, column=2, columnspan=9)
     for i in range(len(values[2])):
         Label(frame4, text=round(values[2][i], accuracy)).grid(
@@ -73,7 +75,7 @@ def disp_info(values) -> None:
         )
 
     frame5 = Frame()
-    frame5.place(x=300, y=690)
+    frame5.place(x=545, y=450)
     Label(frame5, text="Отсортированный вектор X").grid(row=1, column=2, columnspan=9)
     for i in range(len(values[3])):
         Label(frame5, text=round(values[3][i], accuracy)).grid(

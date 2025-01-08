@@ -76,9 +76,9 @@ def list_to_str_convert(val, name) -> list:
             res += str(val) +"\n\n"
     elif type(val) is bool:
         if val:
-            ret += "True"
+            ret += "True \n"
         else:
-            res += "False"
+            res += "False \n"
     elif type(val[0]) is list:
         for i in range(len(val)):
             for j in val[i]:
@@ -97,23 +97,23 @@ def save_info(values) -> None:
     global data_for_save
     if var_status == 1:
         names = ["Vector X",
-                 "Vector Y",
-                 "Vector Z",
-                 "Vector P",
-                 "X*Y",
-                 "Z*P",
-                 "Check_dot_prod"]
+                "Vector Y",
+                "Vector Z",
+                "Vector P",
+                "X*Y",
+                "Z*P",
+                "Check_dot_prod"]
         file_name = "LR_05_number_1_Vershinin.txt"
     else:
         names = ["Matrix A",
-                 "Matrix B",
-                 "Matrix C",
-                 "Transp Matrix A",
-                 "Symmetric checker A",
-                 "Transp Matrix B",
-                 "Symmetric checker B",
-                 "Transp Matrix C",
-                 "Symmetric checker C"]
+                "Matrix B",
+                "Matrix C",
+                "Transp Matrix A",
+                "Symmetric checker A",
+                "Transp Matrix B",
+                "Symmetric checker B",
+                "Transp Matrix C",
+                "Symmetric checker C"]
         file_name = "LR_05_number_2_Vershinin.txt"
 
     data = []
