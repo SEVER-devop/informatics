@@ -125,6 +125,7 @@ def save_info(values) -> None:
 
     data_for_save = []
 
+
 def cmd_btn_calc() -> None:
     try:
         var_status == array
