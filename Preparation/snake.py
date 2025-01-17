@@ -24,14 +24,10 @@ def snake(width) -> list:
             if cur_dir % 2 == 0:
                 step += 1
 
-        
-
-
-
     return mat
 
 
-snake_matrix = snake(width=3)
+snake_matrix = snake(width=4)
 
 for i in snake_matrix:
     print(i)
