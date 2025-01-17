@@ -44,6 +44,7 @@ def disp_info(values) -> None:
     for i in range(len(values[0])):
         val = []
         for j in values[0][i]:
+            print(j)
             val.append(round(j, accuracy))
         Label(frame1, text=val).grid(row=i + 2, column=2, pady=10)
 

@@ -55,8 +55,6 @@ def bubble_sort(vec) -> list:
 
 def selective_sort(vec) -> list:
     vec = [i for i in vec] # создание копии объекта vec
-    vec = [random.randint(-10, 10) for _ in range(10)]
-    print("VEEEC", vec)
     for i in range(len(vec) - 1):
         m = i
         for j in range(i + 1, len(vec)):
@@ -64,21 +62,19 @@ def selective_sort(vec) -> list:
                 m = j
         vec[i], vec[m] = vec[m], vec[i]
 
-    print("SORTED VEC", vec)
-
     return vec
 
-selective_sort([123])
-# matrix = matrix_infill()
-# index = max_elem(matrix)
-# vector_f = vector_infill(matrix, index)
-# bubble_sorted_vector_f = bubble_sort(vector_f)
-# selective_sorted_vector_f = selective_sort(vector_f)
 
-# print("Матрица")
-# for i in matrix:
-#     print(i)
-# print(f"Максимальный элемент: {matrix[index[1]][index[0]]}", 
-#     f"Вектор F:\n{vector_f}",
-#     f"Сортировка пузырьком:\n{bubble_sorted_vector_f}",
-#     f"Сортировка выбором:\n{selective_sorted_vector_f}", sep="\n")
+matrix = matrix_infill()
+index = max_elem(matrix)
+vector_f = vector_infill(matrix, index)
+bubble_sorted_vector_f = bubble_sort(vector_f)
+selective_sorted_vector_f = selective_sort(vector_f)
+
+print("Матрица")
+for i in matrix:
+    print(i)
+print(f"Максимальный элемент: {matrix[index[1]][index[0]]}", 
+    f"Вектор F:\n{vector_f}",
+    f"Сортировка пузырьком:\n{bubble_sorted_vector_f}",
+    f"Сортировка выбором:\n{selective_sorted_vector_f}", sep="\n")
