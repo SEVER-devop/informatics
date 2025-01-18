@@ -22,8 +22,7 @@ def selective_sorting(vec) -> list:
                 m = j
                 
         vec[m], vec[i] = vec[i], vec[m]
-
-
+        
     return vec
 
 

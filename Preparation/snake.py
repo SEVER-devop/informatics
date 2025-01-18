@@ -1,6 +1,6 @@
 def snake(width) -> list:
     mat = [[None for _ in range(width)] for _ in range(width)]
-    
+
     direction = [(0, 1), (1, 0), (0, -1), (-1, 0)]
     x, y = width // 2, width // 2
     if width % 2 == 0:
