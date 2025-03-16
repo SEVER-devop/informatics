@@ -27,3 +27,13 @@ b = Rec(a)
 
 
 b.get_data()
+
+
+from sympy import symbols, Eq, solve, exp
+
+x = symbols('x')
+eq = Eq(eval("- 2*x + 1"), 0)
+solution = solve(eq, x)
+g_x = solution[0]
+
+print(g_x)
