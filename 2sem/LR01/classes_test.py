@@ -1,3 +1,5 @@
+import math as mt
+
 class Calc():
 
     def __init__(self) -> None:
@@ -32,8 +34,9 @@ b.get_data()
 from sympy import symbols, Eq, solve, exp
 
 x = symbols('x')
-eq = Eq(eval("- 2*x + 1"), 0)
+eq = Eq(eval("exp(2*x) + 3"), 0)
 solution = solve(eq, x)
 g_x = solution[0]
 
 print(g_x)
+
