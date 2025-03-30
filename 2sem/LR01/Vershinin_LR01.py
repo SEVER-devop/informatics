@@ -1,6 +1,9 @@
 import math as mt
 import re
 
+# import matplotlib.pyplot as plt
+from matplotlib.figure import Figure 
+from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 from tkinter import *
 
 import sympy as sm
@@ -11,18 +14,20 @@ import numpy as np
 
 class RootFinder:
     def __init__(self):
-        self.values = [None for _ in range(4)]
+        self.values = [None for _ in range(5)]
+        self.widgets = []
         self.eps = 1e-6
         self.max_iter = 300
-        self.left_border = -5
+        self.left_border = 0
         self.right_border = 1
+        self.initial_guess = 0.2
         self.function = "exp(-2*x) - 2*x + 1"
         # self.function = "tan(0.5 * x + 0.2) - x**2"
         # self.function = "x**2 + 4*sin(x)"
         # self.function = "atan(x) + 1/3 * x**3"
         # self.function = "1.8 * x**2 - sin(10*x)"
         # self.function = "x - log(x) - 5"
-        self.function = "3**(x-1) + 4 - x"
+        # self.function = "3**(x-1) + 4 - x"
         # self.function = "tan(0.5 * x + 0.2) - x**2"
         # self.function = "tan(0.5 * x + 0.2) - x**2"
         # self.function = "tan(0.5 * x + 0.2) - x**2"
@@ -31,7 +36,7 @@ class RootFinder:
         self.replacement = ["cos", "sin", "exp", "log", "tan", "atan"]
     
 
-    def __f(self, x):
+    def func_x(self, x):
         fun = self.function
         for i in self.replacement:
             if i != 'tan' and i != 'atan':
@@ -52,9 +57,9 @@ class RootFinder:
         b = self.right_border
         counter = 0
         x = (a + b) / 2
-        while abs(self.__f(x)) > self.eps:
+        while abs(self.func_x(x)) > self.eps:
             counter += 1
-            if self.__f(x) * self.__f(a) < 0:
+            if self.func_x(x) * self.func_x(a) < 0:
                 b = x
             else:
                 a = x
@@ -73,11 +78,11 @@ class RootFinder:
         counter = 0
         while True:
             counter += 1
-            m = (self.__f(b) * a 
-                 - self.__f(a) * b) / (self.__f(b) - self.__f(a))
-            if abs(self.__f(m)) < self.eps:
+            m = (self.func_x(b) * a 
+                 - self.func_x(a) * b) / (self.func_x(b) - self.func_x(a))
+            if abs(self.func_x(m)) < self.eps:
                 break
-            elif self.__f(a) * self.__f(m) < 0:
+            elif self.func_x(a) * self.func_x(m) < 0:
                 b = m
             else:
                 a = m
@@ -114,7 +119,7 @@ class RootFinder:
         counter = 0
         while True:
             counter += 1
-            x1 = x0 - self.__f(x0) / df(x0)
+            x1 = x0 - self.func_x(x0) / df(x0)
             if abs(x1 - x0) < self.eps:
                 break
             x0 = x1
@@ -296,48 +301,155 @@ class RootFinder:
 
     # Scipy
     def __scipy_method(self):
-        pass
+        initial_guess = self.initial_guess
+        root = fsolve(self.func_x, 0.2)[0]
+        fun_value = self.func_x(root)
         
+        self.values[4] = (float(root), float(fun_value))
+
 
     def get_roots(self):
         self.__dichotomy()
-        # self.__chord_method()
+        self.__chord_method()
         self.__newton_raphson()
         self.__simple_iteration()
+        self.__scipy_method()
         return self.values
 
-a = RootFinder()
-print(a.get_roots())
+roots = RootFinder()
 
 
-def start() -> None:
-    global GLOBAL_NAMES
+def error(er='Ошибка'):
+    er_win = Toplevel(win)
+    er_win.title("Ошибка")
+    er_win.geometry("350x150")
+    Label(er_win, text=er, font="30", bg="red").pack()
 
+# Добавить поля для ввода границ построения графика,  поле для шага
+# Универсальность для разных графиков
+def plot_graph(ent_eq, ent_left, ent_right) -> None:
+
+    equation = ent_eq.get()
+    try:
+        left_border = float(ent_left.get())
+        right_border = float(ent_right.get())
+    except ValueError:
+        return error("Введите численные значениия\n в границах")
+    roots.function = equation
+    roots.left_border = left_border
+    roots.right_border = right_border
+    
+    step = 0.001
+    x = [i * step for i in range(int(left_border/step), int(right_border/step+1))]
+    y = [roots.func_x(i) for i in x]
+    # plt.plot(x, y)
+    # plt.show()
+
+
+    fig = Figure(figsize=(4, 4), facecolor='peachpuff')
+    ax = fig.add_subplot(facecolor='bisque')   
+    ax.scatter(x, y, s=1)
+    ax.axis('on')
+    ax.axhline(y=0, color='r', linestyle='-', linewidth=1)
+    fig.patch.set_edgecolor('whitesmoke')
+    fig.patch.set_linewidth(2) 
+
+    canvas1 = FigureCanvasTkAgg(fig, master = win)
+    canvas1.draw()
+    canvas1.get_tk_widget().place(x=0, y=300)
+    roots.widgets.append(canvas1)
+
+    
+def disp_info(ent_accur, ent_iter, ent_scipy) -> None:
+    try:
+        accuracity = float(ent_accur.get())
+        itterations = int(ent_iter.get())
+        scipy_accur = float(ent_scipy.get())
+    except ValueError:
+        return error("Введите численные значениия\n в границах")
+    roots.eps = accuracity
+    roots.initial_guess = scipy_accur
+    roots.max_iter = itterations
+
+    values = roots.get_roots()
+    for value in values:
+        print(value)
+
+
+def tkinter_fun() -> None:
+    
     win.title("Лабораторная работа №1 Вершинин АТ-24-01")
-    win.geometry("1350x750")
+    win.state('zoomed')
     win.resizable(0, 0)
     win.attributes("-alpha", 0.96)
-    Label(text="Вершинин Сергей АТ-24-01\nВариант №3").pack()
-    ent1 = Entry(win, textvariable=StringVar(value=0), width=5)
-    ent1.place(x=100, y=100)
-    ent2 = Entry(win, textvariable=StringVar(value=1), width=5)
-    ent2.place(x=120, y=100)
+    win.config(bg="bisque")
+    Label(text="Вершинин Сергей АТ-24-01\nВариант №3", font="30", bg="bisque").pack(pady=10, padx=10, anchor=NE)
+
+    Canvas(bg="peachpuff", width=395, height=300).place(x=1, y=1)
+    Canvas(bg="bisque2", width=275, height=170).place(x=398, y=1)
+    Canvas(bg="bisque2", width=226, height=70).place(x=170, y=1)
 
 
-    GLOBAL_NAMES = [ent1, ent2, ent3, ent4]
-    btn1 = Button(win, text="RESET", command=lambda x=GLOBA_NAMES: rst(x))
-    btn1.place(x=10, y=10)
+    # Границы
+    Label(text="Границы", font="15", bg="peachpuff").place(x=23, y=105)
+    ent_left_border = Entry(win, textvariable=StringVar(value=0), width=5, justify=CENTER)
+    ent_left_border.place(x=25, y=135)
+    ent_right_border = Entry(win, textvariable=StringVar(value=1), width=5, justify=CENTER)
+    ent_right_border.place(x=65, y=135)
+
+    # Уравнение
+    Label(text="Уравнение", font="15", bg="bisque2").place(x=230, y=5)
+    ent_equation = Entry(win, textvariable=StringVar(value="exp(-2*x) - 2*x + 1"), width=30, justify=CENTER)
+    ent_equation.place(x=190, y=40)
+
+    Radiobutton(win, textvariable=StringVar(value="tan(0.5 * x + 0.2) - x**2"), bg="bisque2", font="15",
+                command=lambda: [ent_equation.delete(0, END), ent_equation.insert(0, "tan(0.5 * x + 0.2) - x**2")]).place(x=420, y=10)
+    Radiobutton(win, textvariable=StringVar(value="x**2 + 4*sin(x)"), bg="bisque2", font="15",
+                command=lambda: [ent_equation.delete(0, END), ent_equation.insert(0, "x**2 + 4*sin(x)")]).place(x=420, y=10)
+    Radiobutton(win, textvariable=StringVar(value="atan(x) + 1/3 * x**3"), bg="bisque2", font="15",
+                command=lambda: [ent_equation.delete(0, END), ent_equation.insert(0, "atan(x) + 1/3 * x**3")]).place(x=420, y=50)
+    Radiobutton(win, textvariable=StringVar(value="1.8 * x**2 - sin(10*x)"), bg="bisque2", font="15",
+                command=lambda: [ent_equation.delete(0, END), ent_equation.insert(0, "1.8 * x**2 - sin(10*x)")]).place(x=420, y=90)
+    Radiobutton(win, textvariable=StringVar(value="exp(-2*x) - 2*x + 1"), bg="bisque2", font="15",
+                command=lambda: [ent_equation.delete(0, END), ent_equation.insert(0, "exp(-2*x) - 2*x + 1")]).place(x=420, y=130)
+    
+    Button(win, text="Построить\nграфик", command=lambda x=ent_equation,
+                                                         y=ent_left_border,
+                                                         z=ent_right_border: plot_graph(x, y, z)).place(x=70, y=13)
+    
+    # Точность, итерации, scipy
+    Label(text="Точность", font="15", bg="peachpuff").place(x=115, y=105)
+    ent_accuracy = Entry(win, textvariable=StringVar(value="1e-6"), width=9, justify=CENTER)
+    ent_accuracy.place(x=130, y=135)
+    Label(text="Кол-во итераций", font="15", bg="peachpuff").place(x=220, y=105)
+    ent_iter = Entry(win, textvariable=StringVar(value="300"), width=15, justify=CENTER)
+    ent_iter.place(x=250, y=135)
+    Label(text="Приближение для scipy", font="15", bg="peachpuff").place(x=115, y=105)
+    ent_accuracy_scipy = Entry(win, textvariable=StringVar(value="0.2"), width=9, justify=CENTER)
+    ent_accuracy_scipy.place(x=130, y=135)
+
+    # Расчет всех корней
+    Button(win, text="Рассчитать корни", font="15", command= lambda x=ent_accuracy,
+                                                                    y=ent_iter,
+                                                                    z=ent_accuracy_scipy: disp_info(x, y, z)).place(x=100, y=200)
+    
+    all_wid = [ent_left_border, ent_right_border, ent_equation, ent_accuracy, ent_iter, ent_accuracy_scipy]
+    roots.widgets.extend(all_wid)
+    Button(win, text="RESET", bg="red", command=rst).place(x=5, y=5)
 
 
+def rst() -> None:
+    values = ['0', '1', "exp(-2*x) - 2*x + 1", "1e-6", "300", "0.2"]
+    for i in range(len(roots.widgets)):
+        if "matplotlib.backends.backend_tkagg.FigureCanvasTkAgg" in str(roots.widgets[i]):
+            roots.widgets[i].get_tk_widget().destroy()
+        else:
+            roots.widgets[i].delete(0, END)
+            roots.widgets[i].insert(0, values[i])
+        
 
 
-def rst(x) -> None:
-    for i in x:
-        pass
-
-
-
-# if __name__ == "__main__":
-#     win = Tk()
-#     start()
-#     win.mainloop()
+if __name__ == "__main__":
+    win = Tk()
+    tkinter_fun()
+    win.mainloop()

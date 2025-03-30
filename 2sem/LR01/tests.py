@@ -76,6 +76,6 @@ def express_through_x(equation_string):
     return solution[0]
 
 # Пример использования
-equation_string = "atan(10) + 1/3 * x**3"
+equation_string = "sin(x) + (1/3)*x**3 = 0"
 g_x = express_through_x(equation_string)
 print(g_x)

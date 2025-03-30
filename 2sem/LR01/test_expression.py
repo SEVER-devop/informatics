@@ -82,7 +82,7 @@ def variable_expression(val) -> list:
 
 st = "exp(-2*x) + 1"
 st = "atan(x) + 1/3 * x**3"
-st = "atan(10) + 1/3 * x**3"
+
 
 result = variable_expression(st)
 print(result)
