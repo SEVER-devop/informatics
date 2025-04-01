@@ -32,7 +32,7 @@ class RootFinder:
         # self.function = "tan(0.5 * x + 0.2) - x**2"
         # self.function = "tan(0.5 * x + 0.2) - x**2"
 
-        self.x0 = -2
+        self.x0 = (abs(self.left_border) + self.right_border) / 2
         self.replacement = ["cos", "sin", "exp", "log", "tan", "atan"]
     
 
@@ -115,7 +115,7 @@ class RootFinder:
 
             return res
         
-        x0 = self.x0
+        x0 = self.initial_guess
         counter = 0
         while True:
             counter += 1
@@ -133,7 +133,7 @@ class RootFinder:
     # Метод простых итераций
     def __simple_iteration(self):
 
-        def __replacment_finder():
+        def __replacment_finder() -> list:
                     reps = ""
                     rev_reps = []
                     for rep in self.replacement:
@@ -302,10 +302,10 @@ class RootFinder:
     # Scipy
     def __scipy_method(self):
         initial_guess = self.initial_guess
-        root = fsolve(self.func_x, 0.2)[0]
+        root = fsolve(self.func_x, initial_guess)[0]
         fun_value = self.func_x(root)
         
-        self.values[4] = (float(root), float(fun_value))
+        self.values[4] = (float(root), None)
 
 
     def get_roots(self):
@@ -372,8 +372,32 @@ def disp_info(ent_accur, ent_iter, ent_scipy) -> None:
     roots.max_iter = itterations
 
     values = roots.get_roots()
-    for value in values:
-        print(value)
+    names_methods = ["Дихотомии", "Хорд", "Касательных", "Итераций", "Scipy"]
+    names_up = ["Методы вычисления", "Значение корна", "Кол-во итераций"]
+    table_frame = Frame(master=win, bg="peachpuff")
+    table_frame.place(x=700, y=250)
+    roots.widgets.append(table_frame)
+
+    for i in range(len(names_up)):
+        cell = Label(table_frame, text=f"{names_up[i]}", bg="peachpuff", font="15" )
+        cell.grid(row=0, column=i, padx=20)
+
+    for i in range(len(names_methods)):
+        cell = Label(table_frame, text=f"{names_methods[i]}", bg="peachpuff", font="15" )
+        cell.grid(row=i+1, column=0, padx=20, pady=20)
+        for j in range(len(values[i])):
+            if "П" in str(values[i][0]):
+                text = f"Превышено максимальное\nкол-во итераций {roots.max_iter}\nв " + names_methods[i]
+                error(text)
+                cell = Label(table_frame, text=f"Ошибка", bg="peachpuff", font="15" )
+                cell.grid(row=i+1, column=j+1, padx=20)
+                break
+            elif names_methods[i] == "Scipy" and j == 1:
+                cell = Label(table_frame, text=f"{values[2][1]}", bg="peachpuff", font="15" )
+                cell.grid(row=i+1, column=j+1, padx=20)
+            else:
+                cell = Label(table_frame, text=f"{values[i][j]}", bg="peachpuff", font="15" )
+                cell.grid(row=i+1, column=j+1, padx=20)
 
 
 def tkinter_fun() -> None:
@@ -383,7 +407,7 @@ def tkinter_fun() -> None:
     win.resizable(0, 0)
     win.attributes("-alpha", 0.96)
     win.config(bg="bisque")
-    Label(text="Вершинин Сергей АТ-24-01\nВариант №3", font="30", bg="bisque").pack(pady=10, padx=10, anchor=NE)
+    Label(text="Вершинин Сергей АТ-24-01\nВариант №3", font="30", bg="bisque").place(x=70, y=740)
 
     Canvas(bg="peachpuff", width=395, height=300).place(x=1, y=1)
     Canvas(bg="bisque2", width=275, height=170).place(x=398, y=1)
@@ -424,14 +448,14 @@ def tkinter_fun() -> None:
     Label(text="Кол-во итераций", font="15", bg="peachpuff").place(x=220, y=105)
     ent_iter = Entry(win, textvariable=StringVar(value="300"), width=15, justify=CENTER)
     ent_iter.place(x=250, y=135)
-    Label(text="Приближение для scipy", font="15", bg="peachpuff").place(x=115, y=105)
+    Label(text="Приближение\nscipy", font="15", bg="peachpuff").place(x=25, y=180)
     ent_accuracy_scipy = Entry(win, textvariable=StringVar(value="0.2"), width=9, justify=CENTER)
-    ent_accuracy_scipy.place(x=130, y=135)
+    ent_accuracy_scipy.place(x=60, y=235)
 
     # Расчет всех корней
     Button(win, text="Рассчитать корни", font="15", command= lambda x=ent_accuracy,
                                                                     y=ent_iter,
-                                                                    z=ent_accuracy_scipy: disp_info(x, y, z)).place(x=100, y=200)
+                                                                    z=ent_accuracy_scipy: disp_info(x, y, z)).place(x=185, y=220)
     
     all_wid = [ent_left_border, ent_right_border, ent_equation, ent_accuracy, ent_iter, ent_accuracy_scipy]
     roots.widgets.extend(all_wid)
@@ -443,6 +467,8 @@ def rst() -> None:
     for i in range(len(roots.widgets)):
         if "matplotlib.backends.backend_tkagg.FigureCanvasTkAgg" in str(roots.widgets[i]):
             roots.widgets[i].get_tk_widget().destroy()
+        elif ".!frame" in str(roots.widgets[i]):
+            roots.widgets[i].destroy()
         else:
             roots.widgets[i].delete(0, END)
             roots.widgets[i].insert(0, values[i])
