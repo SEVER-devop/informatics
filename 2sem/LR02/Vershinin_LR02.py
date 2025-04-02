@@ -13,7 +13,7 @@ import numpy as np
 
 class RootFinder:
     def __init__(self):
-        self.values = [(None, None) for _ in range(5)]
+        self.values = [(None, None, None) for _ in range(5)]
         self.widgets = []
         self.eps = 1e-3
         self.max_iter = 1000
@@ -29,16 +29,16 @@ class RootFinder:
         return x**2 - y**2 - 0.75
 
     def __jacobian(self, x, y):
-        df1_dx = np.cos(x - y) - y
-        df1_dy = -np.cos(x - y) - x
-        df2_dx = 2*x
-        df2_dy = -2*y
-        return np.array([[df1_dx, df1_dy], [df2_dx, df2_dy]])
+        f1_dx = np.cos(x - y) - y
+        f1_dy = -np.cos(x - y) - x
+        f2_dx = 2*x
+        f2_dy = -2*y
+        return np.array([[f1_dx, f1_dy], [f2_dx, f2_dy]])
 
     def __jacobi_method(self):
         x, y = self.initial_guess, 0.0
-        
-        for _ in range(self.max_iter):
+
+        for iter_counter in range(self.max_iter):
             x_old, y_old = x, y
             
             if x_old >= 0:
@@ -51,13 +51,13 @@ class RootFinder:
             if abs(x - x_old) < self.eps and abs(y - y_old) < self.eps:
                 break
                 
-        self.values[0] = (x, y)
+        self.values[0] = (x, y, iter_counter)
 
 
     def __gauss_seidel_method(self):
         x, y = self.initial_guess, 0
         
-        for _ in range(self.max_iter):
+        for iter_couter in range(self.max_iter):
             x_old, y_old = x, y
             
             if x >= 0:
@@ -70,13 +70,13 @@ class RootFinder:
             if abs(x - x_old) < self.eps and abs(y - y_old) < self.eps:
                 break
         
-        self.values[1] = (x, y)
+        self.values[1] = (x, y, iter_couter)
 
 
     def __newton_method(self):
         x, y = self.initial_guess, 0
         
-        for _ in range(self.max_iter):
+        for iter_counter in range(self.max_iter):
             F = np.array([self.__f1(x, y), self.__f2(x, y)])
             J = self.__jacobian(x, y)
             
@@ -91,7 +91,7 @@ class RootFinder:
             if np.linalg.norm(delta) < self.eps:
                 break
         
-        self.values[2] = (x, y)
+        self.values[2] = (x, y, iter_counter)
 
 
     def __sympy_method(self):
@@ -103,7 +103,7 @@ class RootFinder:
 
         res = nsolve([eq1, eq2], [x, y], [self.initial_guess, 0])
         
-        self.values[3] = (res[0], res[1])
+        self.values[3] = (res[0], res[1], None)
 
 
 
@@ -173,10 +173,10 @@ def disp_info(ent_accur, ent_iter, ent_init_guess) -> None:
     roots.initial_guess = init_guess
 
     values = roots.get_roots()
-    names_methods = ["Дихотомии", "Хорд", "Касательных", "Sympy"]
-    names_up = ["Методы вычисления", "Значение x", "Значение y"]
+    names_methods = ["Якоби", "Гаусс", "Ньютон", "Sympy"]
+    names_up = ["Методы вычисления", "Значение x", "Значение y", "Кол-во итераций"]
     table_frame = Frame(master=win, bg="peachpuff")
-    table_frame.place(x=700, y=250)
+    table_frame.place(x=500, y=250)
     roots.widgets.append(table_frame)
 
     for i in range(len(names_up)):
@@ -219,7 +219,7 @@ def tkinter_fun() -> None:
     Label(text="\u007B", font=("calibri light", 40), bg="bisque2").place(x=200, y=23)
 
     Button(win, text="Построить\nграфик", font="15", bg="bisque2", command=lambda y=ent_left_border,
-                                                         z=ent_right_border: plot_graph(y, z)).place(x=70, y=30)
+                                                         z=ent_right_border: plot_graph(y, z)).place(x=50, y=30)
     
     # Точность, итерации, scipy
     Label(text="Точность", font="15", bg="peachpuff").place(x=115, y=105)
@@ -228,7 +228,7 @@ def tkinter_fun() -> None:
     Label(text="Кол-во итераций", font="15", bg="peachpuff").place(x=220, y=105)
     ent_iter = Entry(win, textvariable=StringVar(value="1000"), width=15, justify=CENTER)
     ent_iter.place(x=250, y=135)
-    Label(text="Приближение\nscipy", font="15", bg="peachpuff").place(x=25, y=180)
+    Label(text="Приближение\n по x", font="15", bg="peachpuff").place(x=25, y=180)
     ent_accuracy_scipy = Entry(win, textvariable=StringVar(value="1"), width=9, justify=CENTER)
     ent_accuracy_scipy.place(x=60, y=235)
 
