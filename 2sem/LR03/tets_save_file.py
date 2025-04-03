@@ -12,3 +12,6 @@ with open("my_file.csv", "w") as f:
     writer = csv.writer(f, delimiter=";", lineterminator="\n")
     writer.writerow(field)
     writer.writerows(data)
+
+
+

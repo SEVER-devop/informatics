@@ -11,9 +11,9 @@ class RootFinder:
         self.widgets = []
         self.eps = 1e-3
         self.matrix_a = [
-                            [3.6, 2.7, 1.5],
-                            [1.8, -3.6, 4.5],
-                            [-4.7, 1.9, 3.3]
+                            [3.6, 1.8, -4.7],
+                            [2.7, -3.6, 1.9],
+                            [1.5, 4.5, 3.3]
                         ]
         self.matrix_b = [3.8, 0.4, -1.6]
 
@@ -55,26 +55,21 @@ class RootFinder:
     
         n = len(matrix_b)
         for i in range(n):
-            # Частичный выбор ведущего элемента
             max_row = i
             for k in range(i+1, n):
                 if abs(matrix_a[k][i]) > abs(matrix_a[max_row][i]):
                     max_row = k
             
-            # Перестановка строк
             matrix_a[i], matrix_a[max_row] = matrix_a[max_row], matrix_a[i]
             matrix_b[i], matrix_b[max_row] = matrix_b[max_row], matrix_b[i]
             
-            # Проверка на вырожденность
             if abs(matrix_a[i][i]) < self.eps:
                 raise ValueError("Матрица вырождена - система не имеет решения")
             
-            # Нормализация текущей строки
             prev_el = matrix_a[i][i]
             matrix_a[i] = [a/prev_el for a in matrix_a[i]]
             matrix_b[i] /= prev_el
             
-            # Обнуление всех элементов в столбце
             for k in range(n):
                 if k != i:
                     m = matrix_a[k][i]
