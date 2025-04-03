@@ -378,26 +378,33 @@ def disp_info(ent_accur, ent_iter, ent_scipy) -> None:
     table_frame.place(x=700, y=250)
     roots.widgets.append(table_frame)
 
-    for i in range(len(names_up)):
-        cell = Label(table_frame, text=f"{names_up[i]}", bg="peachpuff", font="15" )
-        cell.grid(row=0, column=i, padx=20)
 
-    for i in range(len(names_methods)):
-        cell = Label(table_frame, text=f"{names_methods[i]}", bg="peachpuff", font="15" )
-        cell.grid(row=i+1, column=0, padx=20, pady=20)
-        for j in range(len(values[i])):
-            if "П" in str(values[i][0]):
-                text = f"Превышено максимальное\nкол-во итераций {roots.max_iter}\nв " + names_methods[i]
-                error(text)
-                cell = Label(table_frame, text=f"Ошибка", bg="peachpuff", font="15" )
-                cell.grid(row=i+1, column=j+1, padx=20)
-                break
-            elif names_methods[i] == "Scipy" and j == 1:
-                cell = Label(table_frame, text=f"{values[2][1]}", bg="peachpuff", font="15" )
-                cell.grid(row=i+1, column=j+1, padx=20)
-            else:
-                cell = Label(table_frame, text=f"{values[i][j]}", bg="peachpuff", font="15" )
-                cell.grid(row=i+1, column=j+1, padx=20)
+    with open("LR01.txt", 'w+') as f:
+        for i in range(len(names_up)):
+            cell = Label(table_frame, text=f"{names_up[i]}", bg="peachpuff", font="15" )
+            cell.grid(row=0, column=i, padx=20)
+            f.write(str(names_up[i] + "  " ))
+            
+        for i in range(len(names_methods)):
+            cell = Label(table_frame, text=f"{names_methods[i]}", bg="peachpuff", font="15" )
+            cell.grid(row=i+1, column=0, padx=20, pady=20)
+            f.write("\n" + str(names_methods[i]) + "           ")
+            for j in range(len(values[i])):
+                if "П" in str(values[i][0]):
+                    text = f"Превышено максимальное\nкол-во итераций {roots.max_iter}\nв " + names_methods[i]
+                    f.write(text + "\n")
+                    error(text)
+                    cell = Label(table_frame, text=f"Ошибка", bg="peachpuff", font="15" )
+                    cell.grid(row=i+1, column=j+1, padx=20)
+                    break
+                elif names_methods[i] == "Scipy" and j == 1:
+                    f.write(f"{values[2][1]}" + "\n")
+                    cell = Label(table_frame, text=f"{values[2][1]}", bg="peachpuff", font="15" )
+                    cell.grid(row=i+1, column=j+1, padx=20)
+                else:
+                    f.write(f"{values[i][j]}" + "  ")
+                    cell = Label(table_frame, text=f"{values[i][j]}", bg="peachpuff", font="15" )
+                    cell.grid(row=i+1, column=j+1, padx=20)
 
 
 def tkinter_fun() -> None:
