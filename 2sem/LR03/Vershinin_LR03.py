@@ -11,11 +11,21 @@ class RootFinder:
         self.widgets = []
         self.eps = 1e-3
         self.matrix_a = [
-                            [3.6, 1.8, -4.7],
-                            [2.7, -3.6, 1.9],
-                            [1.5, 4.5, 3.3]
+                            [0, 1.8, -4.7],
+                            [2.7, 0, 1.9],
+                            [1.5, 4.5, 0]                                                                                                                                                                                                                                                                                                                                
                         ]
         self.matrix_b = [3.8, 0.4, -1.6]
+        self.flag = True
+
+        # for i in range(len(self.matrix_a)):
+        #     for j in range(len(self.matrix_a)):
+        #         if self.matrix_a[i][i] == 0:
+        #             for j in range(i + 1, len(self.matrix_a)):
+        #                 if self.matrix_a[j][i] != 0:
+        #                     self.matrix_a[i], self.matrix_a[j] = self.matrix_a[j], self.matrix_a[i]
+        #                     self.matrix_b[i], self.matrix_b[j] = self.matrix_b[j], self.matrix_b[i]
+        #                     self.flag = False
 
 
     def __gauss_method(self):
@@ -82,6 +92,8 @@ class RootFinder:
     def get_roots(self):
         self.__gauss_method()
         self.__gauss_jordan_method()
+        if self.flag == False:
+            return [("error", "error", "error") for _ in range(3)]
         return self.values
 
 
