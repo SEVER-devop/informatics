@@ -241,9 +241,9 @@ def disp_info(ent_accur, left, right) -> None:
     names_methods = ["Лев. треуг.", "Средн. треуг.", "Прав. треуг.", "Трапец.", "Симпсон", "Аналитика"]
     names_up = ["Методы вычисления", "RES"]
     table_frame_first = Frame(master=win, bg="peachpuff")
-    table_frame_first.place(x=750, y=70)
+    table_frame_first.place(x=700, y=70)
     table_frame_second = Frame(master=win, bg="peachpuff")
-    table_frame_second.place(x=1200, y=70)
+    table_frame_second.place(x=1100, y=70)
     names_frame = [table_frame_first, table_frame_second]
     roots.widgets.extend(names_frame)
     names_integral = ["Интеграл, заданный функцией","Таблично заданный интеграл"]
@@ -251,13 +251,13 @@ def disp_info(ent_accur, left, right) -> None:
     for j in range(len(names_frame)):
         Label(names_frame[j], text=names_integral[j], bg="peachpuff", font="15").grid(row=0, column=0, columnspan=2, padx=20)
         for i in range(len(names_up)):
-            cell = Label(names_frame[j], text=f"{names_up[i]}", bg="peachpuff", font="15" )
+            cell = Label(names_frame[j], text= f"{names_up[i]}", bg="peachpuff", font="15" )
             cell.grid(row=1, column=i, padx=20, pady=20)
 
         for i in range(len(names_methods)):
             cell = Label(names_frame[j], text=f"{names_methods[i]}", bg="peachpuff", font="15" )
             cell.grid(row=i+2, column=0, padx=20, pady=20)
-            cell = Label(names_frame[j], text=f"{values[i + j*6]}", bg="peachpuff", font="15" )
+            cell = Label(names_frame[j], text=f"{float(values[i + j*6]):.4f}", bg="peachpuff", font="15" )
             cell.grid(row=i+2, column=1, padx=20)
 
 
@@ -321,7 +321,7 @@ def tkinter_fun() -> None:
 
 
     Canvas(bg="peachpuff", width=395, height=300).place(x=1, y=1)
-    Canvas(bg="peachpuff", width=280, height=610).place(x=397, y=1)
+    Canvas(bg="peachpuff", width=280, height=670).place(x=397, y=1)
 
 
     # Интеграл
@@ -345,8 +345,8 @@ def tkinter_fun() -> None:
 
 
     # Уравнение
-    Label(text="Вектор X", font="15", bg="peachpuff").place(x=435, y=10)
-    Label(text="Вектор F(X)", font="15", bg="peachpuff").place(x=565, y=10)
+    Label(text="Вектор X", font="15", bg="peachpuff").place(x=435, y=5)
+    Label(text="Вектор F(X)", font="15", bg="peachpuff").place(x=560, y=5)
     disp_matrix(roots.x_values, 440, 30)
     disp_matrix(roots.y_values, 570, 30)
 
