@@ -1,2 +1,1 @@
-values = []
-print(len(values))
+print("Hello SEVER")
