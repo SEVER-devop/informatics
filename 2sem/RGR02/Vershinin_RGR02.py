@@ -1,6 +1,5 @@
 import math as mt
 
-# import matplotlib.pyplot as plt
 from matplotlib.figure import Figure 
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 from tkinter import *
@@ -9,11 +8,14 @@ from tkinter import ttk
 import numpy as np
 
 from scipy.optimize import root_scalar
+from scipy.integrate import quad
 
 
+'''Классы для нахождения и отображения корней'''
 class SolverNonlinearEquations:
     def __init__(self, win_frame):
         self.win_frame = win_frame
+        self.fun = "x**3 - 3*x**2 + 3"
         self.name = 'First'
         self.values = []
         self.tk_val = ["-1", "3"]
@@ -22,7 +24,7 @@ class SolverNonlinearEquations:
         self.max_iter = 1000
         self.left_border = -1
         self.right_border = 3
-        self.names_methods = ["Корень 1", "Корень 2", "Корень 3", "Sympy"]
+        self.names_methods = ["Корень 1", "Корень 2", "Корень 3", "Scipy"]
         self.names_up = ["", "Значения"]
         
         self.__tkinter_fun_sne()
@@ -32,7 +34,8 @@ class SolverNonlinearEquations:
     def __tkinter_fun_sne(self):
         
         Button(self.win_frame, text="RESET", bg="red", command= lambda: rst(self)).place(x=5, y=5)
-        Label(self.win_frame, text="Задание 1: Нелинейное уравнение", font="14", bg='bisque').place(x=30, y=100)
+        Label(self.win_frame, text="Задание 1: Нелинейное уравнение", font="14", bg='bisque').place(x=50, y=70)
+        Label(self.win_frame, text="x^3 - 3x^2 + 3 = 0", font="14", bg='bisque').place(x=120, y=100)
         Label(self.win_frame, text="Левая граница:", font= "14", bg='bisque').place(x=30, y=140)
         entry_a = Entry(self.win_frame, textvariable=StringVar(value=-1), justify=CENTER)
         entry_a.place(x=230, y=145, width=100)
@@ -132,8 +135,8 @@ class SolverNonlinearEquations:
 
     def get_roots(self):
         try:
-            self.left_border = int(self.widgets[0].get())
-            self.right_border = int(self.widgets[1].get())
+            self.left_border = float(self.widgets[0].get())
+            self.right_border = float(self.widgets[1].get())
         except Exception as e:
             return error(e)
 
@@ -143,23 +146,142 @@ class SolverNonlinearEquations:
         
 class NumericalIntegration:
     def __init__(self, win_frame):
-        pass
+        self.win_frame = win_frame
+        self.fun = "(1 + 0.7 * x**2) / (1.5 + (2*x**2 + 0.3)**0.5)"
+        self.name = 'First'
+        self.values = []
+        self.tk_val = ["0.8", "2.96"]
+        self.widgets = []
+        self.eps = 1e-3
+        self.max_iter = 1000
+        self.left_border = 0.8
+        self.right_border = 2.96
+        self.names_methods = ["Корень n=9", "Корень n=12", "Scipy"]
+        self.names_up = ["", "Значения"]
+        
+        self.__tkinter_fun_ni()
+        plot_graph(self)
+        
+
+    def __tkinter_fun_ni(self):
+
+
+        # Интеграл
+        fig = Figure(figsize=(4, 3), facecolor='bisque')
+        ax = fig.add_subplot(111)
+        ax.axis('off')
+        integral_text = r"$\int_{0{,}8}^{2{,}96} \frac{1 + 0{,}7x^2}{1{,}5 + \sqrt{2x^2 + 0{,}3}} \, dx$"
+        ax.text(0.5, 0.5, integral_text, fontsize=10, 
+                ha='center', va='center', color='black')
+        canvas = FigureCanvasTkAgg(fig, master=self.win_frame)
+        canvas.draw()
+        canvas.get_tk_widget().place(x=-10, y=-35)
+
+        Button(self.win_frame, text="RESET", bg="red", command= lambda: rst(self)).place(x=5, y=5)
+        Label(self.win_frame, text="Задание 2: Численное интегрирование", font="14", bg='bisque').place(x=50, y=70)
+        Label(self.win_frame, text="Левая граница:", font= "14", bg='bisque').place(x=30, y=140)
+        entry_a = Entry(self.win_frame, textvariable=StringVar(value=0.8), justify=CENTER)
+        entry_a.place(x=230, y=145, width=100)
+
+        Label(self.win_frame, text="Правая граница:", font="14", bg='bisque').place(x=30, y=170)
+        entry_b = Entry(self.win_frame, textvariable=StringVar(value=2.96), justify=CENTER)
+        entry_b.place(x=230, y=175, width=100)
+
+        Button(self.win_frame, text="Найти корни", font="14", bg='bisque2', command=lambda: disp_info(self)).place(x=30, y=220)
+        Button(self.win_frame, text="Построить график", font="10", bg='bisque2', command=lambda: plot_graph(self)).place(x=180, y=220)
+
+
+        self.widgets.append(entry_a)
+        self.widgets.extend([entry_b])
+
+    def __integral(self, x):
+        return (1 + 0.7 * x**2) / (1.5 + (2*x**2 + 0.3)**0.5)
+    
+    def scipy_roots_finder(self):
+        result, error = quad(self.__integral, self.left_border, self.right_border)
+        return result
+    
+    def three_eighths(self):
+        a = self.left_border
+        b = self.right_border
+        roots = []
+        for n in [9, 12]:
+            if n % 3 != 0:
+                raise ValueError("Число разбиений должно быть кратно 3")
+
+            h = (b - a) / n
+            x = np.linspace(a, b, n + 1)
+            y = self.__integral(x)
+
+            sum3 = np.sum(y[3:-1:3])
+            other_indices = [i for i in range(1, n) if i % 3 != 0]
+            sum2 = np.sum(y[other_indices])
+            
+            integral = (3 * h / 8) * (y[0] + y[-1] + 3 * sum2 + 2 * sum3)
+            roots.append(integral)
+            
+        return roots
 
     def get_roots(self):
-        self.values = [i for i in []]
-        print("Two")
-        return self.values
+        try:
+            self.left_border = float(self.widgets[0].get())
+            self.right_border = float(self.widgets[1].get())
+        except Exception as e:
+            return error(e)
+
+
+        self.values = [i for i in self.three_eighths()]
+        self.values.append(self.scipy_roots_finder())
 
 class SolverDifferentialEquations:
     def __init__(self, win_frame):
-        pass
+        self.win_frame = win_frame
+        self.name = 'Third'
+        self.values = []
+        self.tk_val = ["0.2", "1.2"]
+        self.widgets = []
+        self.names_methods = ["X", "Y"]
+        self.names_up = ["", "Значения"]
+        
+        self.__tkinter_fun_sde()
+        
+    
+    def __tkinter_fun_sde(self):
+        
+        Button(self.win_frame, text="RESET", bg="red", command= lambda: rst(self)).place(x=5, y=5)
+        Label(self.win_frame, text="Задание 3: Дифференциальное уравнение", font="14", bg='bisque').place(x=50, y=70)
+        Label(self.win_frame, text="y' = 0.158 * (x**2 + sin(0.8 * x)) + 1.164 * y", font="14", bg='bisque').place(x=60, y=100)
+
+        Button(self.win_frame, text="Найти корни", font="14", bg='bisque2', command=lambda: disp_info(self)).place(x=140, y=220)
+
+    def __ode_func(self, x, y):
+        return 0.158 * (x**2  + np.sin(0.8 * x)) + 1.164 * y
+
+    def broken_line_method(self):
+        x0 = 0.2
+        y0 = 0.25
+        x_end = 1.2
+        h = 0.1
+
+        x_vals = [x0]
+        y_vals = [y0]
+        while x0 < x_end:
+            x_half = x0 + h / 2
+            y_half = y0 + (h / 2) * self.__ode_func(x0, y0)
+            y_next = y0 + h * self.__ode_func(x_half, y_half)
+            x0 += h
+            y0 = y_next
+            x_vals.append(round(x0, 4))
+            y_vals.append(round(y0, 4))
+        return x_vals, y_vals
 
     def get_roots(self):
-        self.values = [i for i in []]
-        print("Three")
-        return self.values
+        self.values = [i for i in self.broken_line_method()]
+        plot_graph(self)
 
 
+
+'''Основной класс'''
 class Application:
     def __init__(self, win):
         self.win = win
@@ -210,14 +332,18 @@ def error(er='Ошибка'):
 def plot_graph(obj) -> None:
 
     try:
-        obj.left_border = int(obj.widgets[0].get())
-        obj.right_border = int(obj.widgets[1].get())
+        if obj.name != "Third":
+            obj.left_border = float(obj.widgets[0].get())
+            obj.right_border = float(obj.widgets[1].get())
     except Exception as e:
         return error(e)
     
-
-    x = np.linspace(obj.left_border, obj.right_border, 1000)
-    y = x**3 - 3*x**2 + 3
+    if obj.name != "Third":
+        x = np.linspace(obj.left_border, obj.right_border, 1000)
+        y = eval(obj.fun)
+    else:
+        x = obj.values[0]
+        y = obj.values[1]
 
     fig = Figure(figsize=(4, 4), facecolor='peachpuff')
     ax = fig.add_subplot(facecolor='bisque')
@@ -243,6 +369,7 @@ def disp_info(obj) -> None:
     table_frame = Frame(master=obj.win_frame, bg="peachpuff")
     table_frame.place(x=500, y=250)
     obj.widgets.append(table_frame)
+    print(len(values))
 
     for i in range(len(names_up)):
         cell = Label(table_frame, text=f"{names_up[i]}", bg="peachpuff", font="15" )
@@ -262,6 +389,11 @@ def disp_info(obj) -> None:
         else:
             cell = Label(table_frame, text=f"{values[i]}", bg="peachpuff", font="15" )
             cell.grid(row=i+1, column=1, padx=20)
+        if len(values) == 1:
+            cell = Label(table_frame, text=f"Корней нет", bg="peachpuff", font="15" )
+            cell.grid(row=1, column=1, padx=20)
+            cell = Label(table_frame, text=f"Ошибка", bg="peachpuff", font="15" )
+            cell.grid(row=1, column=0, padx=20)
 
 def tkinter_fun() -> None: 
     win.title("РГР №2 Вершинин АТ-24-01")
