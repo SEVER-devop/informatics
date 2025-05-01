@@ -25,7 +25,7 @@ class SolverLeastSquares:
 
         self.names_methods = ["Полином 2-й ст", "Полином 3-й ст", "Полином 4-й ст", "Полином 5-й ст"]
         self.names_up = ["", "Коэфициент 1", "Коэфициент 2", "Коэфициент 3", "Коэфициент 4", "Коэфициент 5", "Коэфициент 6"]
-        self.names_up_pogr = ["", "Максимальная абсолютная погрешность", "Максимальная относительная погрешность", "Наилучшая аппроксимирующая функция"]
+        self.names_up_pogr = ["", "Максимальная абсолютная погрешность", "Максимальная относительная погрешность", "Лучшая аппроксимирующая ф-ия"]
         
         self.__tkinter_fun_sne()
         plot_graph(self)
@@ -34,7 +34,7 @@ class SolverLeastSquares:
     def __tkinter_fun_sne(self) -> None:
         
         Button(self.win_frame, text="RESET", bg="red", command= lambda: rst(self)).place(x=5, y=5)
-        Label(self.win_frame, text="Задание 1: Метод наименьших квадратов", font="14", bg='bisque').place(x=50, y=70)
+        Label(self.win_frame, text="Задание 1: МНК", font="14", bg='bisque').place(x=50, y=70)
         Label(self.win_frame, text="ln(tg(x/(10)^(1/2)))", font="14", bg='bisque').place(x=120, y=100)
         Label(self.win_frame, text="Левая граница:", font= "14", bg='bisque').place(x=30, y=140)
         entry_a = Entry(self.win_frame, textvariable=StringVar(value=2), justify=CENTER)
