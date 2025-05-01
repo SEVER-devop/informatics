@@ -10,29 +10,31 @@ import numpy as np
 
 '''Классы для нахождения и отображения корней'''
 class SolverLeastSquares:
-    def __init__(self, win_frame):
+    def __init__(self, win_frame) -> None:
         self.win_frame = win_frame
         self.fun = "np.log(np.tan(x/np.sqrt(10)))"
         self.name = 'First'
         self.values = []
+        self.values_pogr = []
         self.tk_val = ["2", "3"]
+
         self.n = 10
         self.widgets = []
-        self.eps = 1e-3
-        self.max_iter = 1000
         self.left_border = 2
         self.right_border = 3
-        self.names_methods = ["Корень 1", "Корень 2", "Корень 3", "Scipy"]
-        self.names_up = ["", "Значения"]
+
+        self.names_methods = ["Полином 2-й ст", "Полином 3-й ст", "Полином 4-й ст", "Полином 5-й ст"]
+        self.names_up = ["", "Коэфициент 1", "Коэфициент 2", "Коэфициент 3", "Коэфициент 4", "Коэфициент 5", "Коэфициент 6"]
+        self.names_up_pogr = ["", "Максимальная абсолютная погрешность", "Максимальная относительная погрешность", "Наилучшая аппроксимирующая функция"]
         
         self.__tkinter_fun_sne()
         plot_graph(self)
         
 
-    def __tkinter_fun_sne(self):
+    def __tkinter_fun_sne(self) -> None:
         
         Button(self.win_frame, text="RESET", bg="red", command= lambda: rst(self)).place(x=5, y=5)
-        Label(self.win_frame, text="Задание 1: Нелинейное уравнение", font="14", bg='bisque').place(x=50, y=70)
+        Label(self.win_frame, text="Задание 1: Метод наименьших квадратов", font="14", bg='bisque').place(x=50, y=70)
         Label(self.win_frame, text="ln(tg(x/(10)^(1/2)))", font="14", bg='bisque').place(x=120, y=100)
         Label(self.win_frame, text="Левая граница:", font= "14", bg='bisque').place(x=30, y=140)
         entry_a = Entry(self.win_frame, textvariable=StringVar(value=2), justify=CENTER)
@@ -42,14 +44,66 @@ class SolverLeastSquares:
         entry_b = Entry(self.win_frame, textvariable=StringVar(value=3), justify=CENTER)
         entry_b.place(x=230, y=175, width=100)
 
-        Button(self.win_frame, text="Найти корни", font="14", bg='bisque2', command=lambda: disp_info(self)).place(x=30, y=220)
+        Button(self.win_frame, text="Найти корни", font="14", bg='bisque2', command=lambda: disp_info(self, 0, 700)).place(x=30, y=220)
         Button(self.win_frame, text="Построить график", font="10", bg='bisque2', command=lambda: plot_graph(self)).place(x=180, y=220)
 
 
         self.widgets.append(entry_a)
         self.widgets.extend([entry_b])
 
+
+
+    # def __polynomial(self, x, coefficients) -> int:
+    #     return sum(coef * x**i for i, coef in enumerate(coefficients))
+
+    def __gaus_solver(self, matrix_a, matrix_b) -> list:
+        n = len(matrix_b)
         
+        # Прямой ход метода Гаусса
+        for k in range(n):
+            max_row = k
+            for i in range(k + 1, n):
+                if abs(matrix_a[i, k]) > abs(matrix_a[max_row, k]):
+                    max_row = i
+            matrix_a[[k, max_row]] = matrix_a[[max_row, k]]
+            matrix_b[[k, max_row]] = matrix_b[[max_row, k]]
+            
+            pivot = matrix_a[k, k]
+            if pivot == 0:
+                raise ValueError("Матрица системы вырождена")
+            matrix_a[k] /= pivot
+            matrix_b[k] /= pivot
+            
+            for i in range(n):
+                if i != k and matrix_a[i, k] != 0:
+                    factor = matrix_a[i, k]
+                    matrix_a[i] -= matrix_a[k] * factor
+                    matrix_b[i] -= matrix_b[k] * factor
+        
+        return matrix_b
+
+    def __least_squares_fit(self, degree, x, y):
+        matrix_a = np.zeros((degree + 1, degree + 1))
+        matrix_b = np.zeros(degree + 1)
+        
+        for i in range(degree + 1):
+            for j in range(degree + 1):
+                matrix_a[i, j] = np.sum(x**(i + j))
+            matrix_b[i] = np.sum(y * x**i)
+        
+        coefficients = self.__gaus_solver(matrix_a, matrix_b)
+        return coefficients
+
+    # Вычисление значений аппроксимирующего полинома
+    def __evaluate_polynomial(self, coefficients, x) -> int:
+        return sum(coef * x**i for i, coef in enumerate(coefficients))
+
+    def __calculate_errors(self, y_true, y_pred) -> list:
+        absolute_errors = np.abs(y_true - y_pred)
+        relative_errors = absolute_errors / np.abs(y_true)
+        return absolute_errors, relative_errors 
+
+
 
     def get_roots(self):
         try:
@@ -59,82 +113,87 @@ class SolverLeastSquares:
             return error(e)
 
 
-        # self.values = [i for i in self.hord_kasat_method()]
+        degrees = [2, 3, 4, 5]
+        results = {}
+        x_values = np.linspace(self.left_border, self.right_border, self.n)
+        y_values = np.log(np.tan(x_values / np.sqrt(10)))   
+
+        for degree in degrees:
+            coefficients = self.__least_squares_fit(degree, x_values, y_values)
+            y_pred = self.__evaluate_polynomial(coefficients, x_values)
+            abs_errors, rel_errors = self.__calculate_errors(y_values, y_pred)
+            
+            results[degree] = {
+                'coefficients': coefficients,
+                'y_pred': y_pred,
+                'abs_errors': abs_errors,
+                'rel_errors': rel_errors,
+                'max_abs_error': np.max(abs_errors),
+                'max_rel_error': np.max(rel_errors)
+            }
+        
+        best_degree = min(degrees, key=lambda d: results[d]['max_abs_error'])
+
+
+        self.values = [[i for i in results[degree]['coefficients']] for degree in degrees]
+        self.values_pogr = [[results[degree][i]  for i in ["max_abs_error", "max_rel_error"]] for degree in degrees]
+        self.values_pogr[best_degree-2].append("+")
+        disp_info(self, 500, 100, self.values_pogr)
+        
         
 class SolverLagrange:
     def __init__(self, win_frame):
         self.win_frame = win_frame
-        self.fun = "(1 + 0.7 * x**2) / (1.5 + (2*x**2 + 0.3)**0.5)"
+        self.fun = "np.log(np.tan(x/np.sqrt(10)))"
         self.name = 'First'
+
         self.values = []
-        self.tk_val = ["0.8", "2.96"]
+        self.tk_val = ["2", "3"]
         self.widgets = []
-        self.eps = 1e-3
-        self.max_iter = 1000
-        self.left_border = 0.8
-        self.right_border = 2.96
-        self.names_methods = ["Корень n=9", "Корень n=12", "Scipy"]
+
+        self.n = 10
+        self.left_border = 2
+        self.right_border = 3
+
+        self.names_methods = ["X", "Y точные", "Y Лагранж"]
         self.names_up = ["", "Значения"]
         
-        self.__tkinter_fun_ni()
+        self.__tkinter_fun_se()
         plot_graph(self)
         
 
-    def __tkinter_fun_ni(self):
-
-
-        # Интеграл
-        fig = Figure(figsize=(4, 3), facecolor='bisque')
-        ax = fig.add_subplot(111)
-        ax.axis('off')
-        integral_text = r"$\int_{0{,}8}^{2{,}96} \frac{1 + 0{,}7x^2}{1{,}5 + \sqrt{2x^2 + 0{,}3}} \, dx$"
-        ax.text(0.5, 0.5, integral_text, fontsize=10, 
-                ha='center', va='center', color='black')
-        canvas = FigureCanvasTkAgg(fig, master=self.win_frame)
-        canvas.draw()
-        canvas.get_tk_widget().place(x=-10, y=-35)
-
+    def __tkinter_fun_se(self):
         Button(self.win_frame, text="RESET", bg="red", command= lambda: rst(self)).place(x=5, y=5)
-        Label(self.win_frame, text="Задание 2: Численное интегрирование", font="14", bg='bisque').place(x=50, y=70)
+        Label(self.win_frame, text="Задание 2: Многочлен Лагранжа", font="14", bg='bisque').place(x=50, y=70)
+        Label(self.win_frame, text="ln(tg(x/(10)^(1/2)))", font="14", bg='bisque').place(x=120, y=100)
         Label(self.win_frame, text="Левая граница:", font= "14", bg='bisque').place(x=30, y=140)
-        entry_a = Entry(self.win_frame, textvariable=StringVar(value=0.8), justify=CENTER)
+        entry_a = Entry(self.win_frame, textvariable=StringVar(value=2), justify=CENTER)
         entry_a.place(x=230, y=145, width=100)
 
         Label(self.win_frame, text="Правая граница:", font="14", bg='bisque').place(x=30, y=170)
-        entry_b = Entry(self.win_frame, textvariable=StringVar(value=2.96), justify=CENTER)
+        entry_b = Entry(self.win_frame, textvariable=StringVar(value=3), justify=CENTER)
         entry_b.place(x=230, y=175, width=100)
 
-        Button(self.win_frame, text="Найти корни", font="14", bg='bisque2', command=lambda: disp_info(self)).place(x=30, y=220)
+        Button(self.win_frame, text="Найти корни", font="14", bg='bisque2', command=lambda: disp_info(self, 0, 700)).place(x=30, y=220)
         Button(self.win_frame, text="Построить график", font="10", bg='bisque2', command=lambda: plot_graph(self)).place(x=180, y=220)
 
 
         self.widgets.append(entry_a)
         self.widgets.extend([entry_b])
 
-    def __integral(self, x):
-        return (1 + 0.7 * x**2) / (1.5 + (2*x**2 + 0.3)**0.5)
-    
-    
-    def three_eighths(self):
-        a = self.left_border
-        b = self.right_border
-        roots = []
-        for n in [9, 12]:
-            if n % 3 != 0:
-                raise ValueError("Число разбиений должно быть кратно 3")
 
-            h = (b - a) / n
-            x = np.linspace(a, b, n + 1)
-            y = self.__integral(x)
 
-            sum3 = np.sum(y[3:-1:3])
-            other_indices = [i for i in range(1, n) if i % 3 != 0]
-            sum2 = np.sum(y[other_indices])
-            
-            integral = (3 * h / 8) * (y[0] + y[-1] + 3 * sum2 + 2 * sum3)
-            roots.append(integral)
-            
-        return roots
+    def __lagrange_interpolation(self, x, x_nodes, y_nodes):
+        n = len(x_nodes)
+        result = 0.0
+        for i in range(n):
+            term = y_nodes[i]
+            for j in range(n):
+                if i != j:
+                    term *= (x - x_nodes[j]) / (x_nodes[i] - x_nodes[j])
+            result += term
+        return result
+
 
     def get_roots(self):
         try:
@@ -144,7 +203,24 @@ class SolverLagrange:
             return error(e)
 
 
-        self.values = [i for i in self.three_eighths()]
+        x_values = np.linspace(self.left_border, self.right_border, self.n)
+        y_values = np.log(np.tan(x_values / np.sqrt(10)))
+
+        delta_x = (self.left_border - self.right_border) / self.n
+        x_intermediate = np.array([self.left_border + delta_x * (j + 0.5) for j in range(self.n)])
+        y_exact = np.log(np.tan(x_intermediate / np.sqrt(10)))  # Точные значения
+        y_lagrange = np.array([self.__lagrange_interpolation(x, x_values, y_values) for x in x_intermediate])  # Значения по Лагранжу
+
+
+        absolute_errors = np.abs(y_exact - y_lagrange)
+        relative_errors = absolute_errors / np.abs(y_exact)
+
+        print("\nАбсолютные погрешности:", absolute_errors)
+        print("\nОтносительные погрешности:", relative_errors)
+
+        self.values = [[round(i,4) for i in x_intermediate],
+                       [round(i,4) for i in y_exact],
+                       [round(i,4) for i in y_lagrange]]
 
 
 '''Основной класс'''
@@ -222,14 +298,20 @@ def plot_graph(obj) -> None:
     obj.widgets.append(canvas1)
 
 
-def disp_info(obj) -> None:
+def disp_info(obj, x_cord=500, y_cord=250, dop_values=None) -> None:
+    
+    if not(dop_values):
+        obj.get_roots()
+        values = obj.values
+        names_methods = obj.names_methods
+        names_up = obj.names_up
+    else:
+        values = obj.values_pogr
+        names_methods = obj.names_methods
+        names_up = obj.names_up_pogr
 
-    obj.get_roots()
-    values = obj.values
-    names_methods = obj.names_methods
-    names_up = obj.names_up
     table_frame = Frame(master=obj.win_frame, bg="peachpuff")
-    table_frame.place(x=500, y=250)
+    table_frame.place(x=x_cord, y=y_cord)
     obj.widgets.append(table_frame)
 
     for i in range(len(names_up)):

@@ -1,19 +1,14 @@
 import numpy as np
 import matplotlib.pyplot as plt
 
-# Исходные данные
-a, b, n = 2, 3, 10
-delta_x = (b - a) / n
+# Исходные данные из варианта 3
+a = 2
+b = 3
+n = 10
+x_values = np.linspace(a, b, n)
+y_values = np.log(np.tan(x_values / np.sqrt(10)))
 
-# Узлы интерполяции
-x_nodes = np.linspace(a, b, n + 1)
-y_nodes = np.log(np.tan(x_nodes / np.sqrt(10)))
-
-# Промежуточные точки для вычисления
-x_interp = a + delta_x * (np.arange(n) + 0.5)
-y_exact = np.log(np.tan(x_interp / np.sqrt(10)))
-
-
+# Функция для вычисления интерполяционного многочлена Лагранжа
 def lagrange_interpolation(x, x_nodes, y_nodes):
     n = len(x_nodes)
     result = 0.0
@@ -25,38 +20,19 @@ def lagrange_interpolation(x, x_nodes, y_nodes):
         result += term
     return result
 
-# Вычисление интерполированных значений
-y_interp = np.array([lagrange_interpolation(x, x_nodes, y_nodes) for x in x_interp])
+# Вычисление промежуточных точек x_j = a + Δx*(j + 0.5), j = 0, 1, ..., n-1
+delta_x = (b - a) / n
+x_intermediate = np.array([a + delta_x * (j + 0.5) for j in range(n)])
+y_exact = np.log(np.tan(x_intermediate / np.sqrt(10)))  # Точные значения
+y_lagrange = np.array([lagrange_interpolation(x, x_values, y_values) for x in x_intermediate])  # Значения по Лагранжу
 
-# Абсолютная погрешность
-abs_errors = np.abs(y_exact - y_interp)
+# Вычисление погрешностей
+absolute_errors = np.abs(y_exact - y_lagrange)
+relative_errors = absolute_errors / np.abs(y_exact)
 
-# Относительная погрешность (%)
-rel_errors = np.abs((y_exact - y_interp) / y_exact) * 100
-
-# Максимальная погрешность
-max_abs_error = np.max(abs_errors)
-max_rel_error = np.max(rel_errors)
-
-
-
-print("Результаты интерполяции:")
-print("j\tx_j\t\tТочное y\tИнтерполированное y\tАбс. погрешность\tОтн. погрешность (%)")
-for j in range(n):
-    print(f"{j}\t{x_interp[j]:.3f}\t{y_exact[j]:.6f}\t{y_interp[j]:.6f}\t\t{abs_errors[j]:.6f}\t\t{rel_errors[j]:.6f}")
-
-print(f"\nМаксимальная абсолютная погрешность: {max_abs_error:.6f}")
-print(f"Максимальная относительная погрешность: {max_rel_error:.6f}%")
-
-
-
-plt.figure(figsize=(12, 6))
-plt.scatter(x_nodes, y_nodes, color='red', label='Узлы интерполяции', zorder=3)
-plt.scatter(x_interp, y_exact, color='green', label='Точные значения', zorder=2)
-plt.scatter(x_interp, y_interp, color='blue', label='Интерполированные значения', zorder=1)
-plt.xlabel('x')
-plt.ylabel('y')
-plt.title('Интерполяция многочленом Лагранжа')
-plt.legend()
-plt.grid(True)
-plt.show()
+# Вывод результатов
+print("Промежуточные точки (x_j):", x_intermediate)
+print("\nТочные значения (y_exact):", y_exact)
+print("\nЗначения по Лагранжу (y_lagrange):", y_lagrange)
+print("\nАбсолютные погрешности:", absolute_errors)
+print("\nОтносительные погрешности:", relative_errors)
