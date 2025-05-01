@@ -94,22 +94,6 @@ for degree in degrees:
     print(f"Максимальная относительная погрешность: {results[degree]['max_rel_error']}")
     print()
 
-# Построение графиков
-plt.figure(figsize=(12, 8))
-plt.scatter(x_values, y_values, label='Исходные данные', color='black')
-
-x_plot = np.linspace(a, b, 100)
-for degree in degrees:
-    y_plot = evaluate_polynomial(results[degree]['coefficients'], x_plot)
-    plt.plot(x_values, y_values, label=f'Полином {degree}-й степени')
-
-plt.title('Аппроксимация функции полиномами')
-plt.xlabel('x')
-plt.ylabel('y')
-plt.legend()
-plt.grid()
-plt.show()
-
 # Выбор наилучшего полинома
 best_degree = min(degrees, key=lambda d: results[d]['max_abs_error'])
 print(f"Наилучшая аппроксимация: полином {best_degree}-й степени")
