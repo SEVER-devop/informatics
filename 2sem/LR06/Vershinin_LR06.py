@@ -175,7 +175,7 @@ class SolverCauchySysFirstOrder:
 
         self.widgets.append(entry_a)
         self.widgets.extend([entry_b])
-
+      
     def __plot_graph_scsfo(self) -> None:
         try:
             x_euler, y1_euler, y2_euler = self.__euler_method()
@@ -257,7 +257,7 @@ class SolverCauchySysFirstOrder:
             y2[i+1] = y2[i] + self.h * self.__f2(x[i], y1[i], y2[i])
         
         return x, y1, y2
-
+    
     # Метод Рунге-Кутта 4-го порядка
     def __runge_kutta(self):
         h = self.h
@@ -284,7 +284,6 @@ class SolverCauchySysFirstOrder:
             y2[i+1] = y2[i] + (k1_y2 + 2*k2_y2 + 2*k3_y2 + k4_y2)/6
         
         return x, y1, y2
-
 
 
     def get_roots(self) -> None:
