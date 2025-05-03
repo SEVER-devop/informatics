@@ -82,7 +82,7 @@ class SolverLeastSquares:
         
         return matrix_b
 
-    def __least_squares_fit(self, degree, x, y):
+    def __least_squares_fit(self, degree, x, y) -> list:
         matrix_a = np.zeros((degree + 1, degree + 1))
         matrix_b = np.zeros(degree + 1)
         
@@ -105,7 +105,7 @@ class SolverLeastSquares:
 
 
 
-    def get_roots(self):
+    def get_roots(self) -> None:
         try:
             self.left_border = float(self.widgets[0].get())
             self.right_border = float(self.widgets[1].get())
@@ -142,7 +142,7 @@ class SolverLeastSquares:
         
         
 class SolverLagrange:
-    def __init__(self, win_frame):
+    def __init__(self, win_frame) -> None:
         self.win_frame = win_frame
         self.fun = "np.log(np.tan(x/np.sqrt(10)))"
         self.name = 'First'
@@ -162,7 +162,7 @@ class SolverLagrange:
         plot_graph(self)
         
 
-    def __tkinter_fun_se(self):
+    def __tkinter_fun_se(self) -> None:
         Button(self.win_frame, text="RESET", bg="red", command= lambda: rst(self)).place(x=5, y=5)
         Label(self.win_frame, text="Задание 2: Многочлен Лагранжа", font="14", bg='bisque').place(x=50, y=70)
         Label(self.win_frame, text="ln(tg(x/(10)^(1/2)))", font="14", bg='bisque').place(x=120, y=100)
@@ -183,7 +183,7 @@ class SolverLagrange:
 
 
 
-    def __lagrange_interpolation(self, x, x_nodes, y_nodes):
+    def __lagrange_interpolation(self, x, x_nodes, y_nodes) -> int:
         n = len(x_nodes)
         result = 0.0
         for i in range(n):
@@ -195,7 +195,7 @@ class SolverLagrange:
         return result
 
 
-    def get_roots(self):
+    def get_roots(self) -> None:
         try:
             self.left_border = float(self.widgets[0].get())
             self.right_border = float(self.widgets[1].get())
@@ -225,7 +225,7 @@ class SolverLagrange:
 
 '''Основной класс'''
 class Application:
-    def __init__(self, win):
+    def __init__(self, win) -> None:
         self.win = win
         self.tk_widgets = []
         
@@ -240,7 +240,7 @@ class Application:
 
         self.show_frame(self.frame_squares)
 
-    def create_menu_bar(self):
+    def create_menu_bar(self) -> None:
         """Создает меню-бар с кнопками выбора задачи"""
         menubar = Menu(self.win)
         
@@ -252,7 +252,7 @@ class Application:
         menubar.add_cascade(label="Выбор задания", menu=task_menu)
         self.win.config(menu=menubar)
 
-    def show_frame(self, frame):
+    def show_frame(self, frame) -> None:
         """Показывает выбранный фрейм и скрывает остальные"""
         self.frame_squares.pack_forget()
         self.frame_lagrange.pack_forget()
@@ -260,7 +260,7 @@ class Application:
         frame.pack(fill=BOTH, expand=True)
 
 
-def error(er='Ошибка'):
+def error(er='Ошибка') -> None:
     er_win = Toplevel(win)
     er_win.title("Ошибка")
     er_win.geometry("350x150")
