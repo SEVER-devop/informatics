@@ -316,7 +316,7 @@ class SolverCauchySecondOrder:
     def __init__(self, win_frame) -> None:
         self.win_frame = win_frame
         self.fun = "np.log(np.tan(x/np.sqrt(10)))"
-        self.name = 'First'
+        self.name = 'Third_ss'
 
         self.values = []
         self.tk_val = ["2", "3"]
@@ -325,9 +325,14 @@ class SolverCauchySecondOrder:
         self.n = 10
         self.left_border = 2
         self.right_border = 3
+        self.h = 0.1
+        self.x0 = 0.0
+        self.xn = 1.0
+        self.y0 = 4.0
+        self.y_prime0 = 1.0
 
-        self.names_methods = ["X", "Y точные", "Y Лагранж"]
-        self.names_up = ["", "Значения"]
+        self.names_methods = ["Метод Эйлера", "Метод Рунге-Кутта", "Точное значение"]
+        self.names_up = ["Методы", "y1(0.0)", "y1(0.1)", "y1(0.2)", "y1(0.3)", "y1(0.4)", "y1(0.5)", "y1(0.6)", "y1(0.7)", "y1(0.8)", "y1(0.9)", "y1(1.0)"]
         
         self.__tkinter_fun_se()
         plot_graph(self)
@@ -354,16 +359,54 @@ class SolverCauchySecondOrder:
 
 
 
-    def __lagrange_interpolation(self, x, x_nodes, y_nodes) -> int:
-        n = len(x_nodes)
-        result = 0.0
-        for i in range(n):
-            term = y_nodes[i]
-            for j in range(n):
-                if i != j:
-                    term *= (x - x_nodes[j]) / (x_nodes[i] - x_nodes[j])
-            result += term
-        return result
+    def __f(self, x, y, y_prime):
+        return y + 2*np.exp(x) - x**2
+
+    def __exact_solution(self, x):
+        return (1 + x)*np.exp(x) + np.exp(-x) + x**2 + 2
+
+    # Метод Эйлера для ОДУ второго порядка
+    def __euler_method(self):
+        x = np.arange(self.x0, self.xn + self.h, self.h)
+        y = np.zeros_like(x)
+        y_prime = np.zeros_like(x)
+        
+        y[0] = self.y0
+        y_prime[0] = self.y_prime0
+        
+        for i in range(1, len(x)):
+            y_prime[i] = y_prime[i-1] + self.h * self.__f(x[i-1], y[i-1], y_prime[i-1])
+            y[i] = y[i-1] + self.h * y_prime[i-1]
+        
+        return x, y
+
+    # Метод Рунге-Кутты 4-го порядка для ОДУ второго порядка
+    def __runge_kutta_4(self):
+        x = np.arange(self.x0, self.xn + self.h, self.h)
+        y = np.zeros_like(x)
+        y_prime = np.zeros_like(x)
+        
+        y[0] = self.y0
+        y_prime[0] = self.y_prime0
+        
+        for i in range(1, len(x)):
+            # Преобразуем ОДУ второго порядка в систему двух ОДУ первого порядка
+            def system(Y, x_val):
+                return np.array([Y[1], self.__f(x_val, Y[0], Y[1])])
+            
+            Y = np.array([y[i-1], y_prime[i-1]])
+            
+            k1 = self.h * system(Y, x[i-1])
+            k2 = self.h * system(Y + 0.5*k1, x[i-1] + 0.5*self.h)
+            k3 = self.h * system(Y + 0.5*k2, x[i-1] + 0.5*self.h)
+            k4 = self.h * system(Y + k3, x[i-1] + self.h)
+            
+            Y_new = Y + (k1 + 2*k2 + 2*k3 + k4) / 6
+            
+            y[i] = Y_new[0]
+            y_prime[i] = Y_new[1]
+        
+        return x, y
 
 
     def get_roots(self) -> None:
@@ -374,24 +417,17 @@ class SolverCauchySecondOrder:
             return error(e)
 
 
-        x_values = np.linspace(self.left_border, self.right_border, self.n)
-        y_values = np.log(np.tan(x_values / np.sqrt(10)))
+            # Вычисление решений
+        x_euler, y_euler = self.__euler_method()
+        x_rk, y_rk = self.__runge_kutta_4()
 
-        delta_x = (self.left_border - self.right_border) / self.n
-        x_intermediate = np.array([self.left_border + delta_x * (j + 0.5) for j in range(self.n)])
-        y_exact = np.log(np.tan(x_intermediate / np.sqrt(10)))  # Точные значения
-        y_lagrange = np.array([self.__lagrange_interpolation(x, x_values, y_values) for x in x_intermediate])  # Значения по Лагранжу
-
-
-        absolute_errors = np.abs(y_exact - y_lagrange)
-        relative_errors = absolute_errors / np.abs(y_exact)
-
-        print("\nАбсолютные погрешности:", absolute_errors)
-        print("\nОтносительные погрешности:", relative_errors)
-
-        self.values = [[round(i,4) for i in x_intermediate],
-                       [round(i,4) for i in y_exact],
-                       [round(i,4) for i in y_lagrange]]
+        exact_val = []
+        for i in range(len(x_euler)):
+            exact_val.append(self.__exact_solution(x_euler[i]))
+            
+        self.values = [[round(i,4) for i in y_euler],
+                       [round(i,4) for i in y_rk],
+                       [round(i,4) for i in exact_val]]
 
 
 
