@@ -1,6 +1,11 @@
 from matplotlib.figure import Figure 
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 from tkinter import *
+import math
+import numpy as np
+from matplotlib.figure import Figure 
+from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
+from tkinter import *
 
 import math
 import numpy as np
