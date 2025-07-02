@@ -1,35 +1,20 @@
-import requests
-import base64
-import json
+import matplotlib.pyplot as plt
+import numpy as np
 
-# Docker Hub credentials (if private repo)
-username = "your_username"
-password = "your_password"
-  
+# Создаем массив значений x от -10 до 10 с шагом 0.1
+x = np.arange(-10, 10, 0.1)
 
-auth_token = base64.b64encode(f"{username}:{password}".encode()).decode()
-headers = {
-    "Authorization": f"Basic {auth_token}",
-    "Accept": "application/vnd.docker.distribution.manifest.v2+json"
-}
+# Вычисляем значения y = x^2
+y = x ** 2
 
-# Fetch the image manifest
-registry_url = "https://registry-1.docker.io/v2"
-repo = "dshtrigel/top_secret"
-tag = "42"
+# Создаем график
+plt.figure(figsize=(8, 6))  # Задаем размер графика
+plt.plot(x, y, label='y = x²', color='blue', linewidth=2)  # Рисуем линию
+plt.title('График функции y = x²')  # Заголовок
+plt.xlabel('Ось X')  # Подпись оси X
+plt.ylabel('Ось Y')  # Подпись оси Y
+plt.grid(True)  # Включаем сетку
+plt.legend()  # Показываем легенду
 
-# Step 1: Get auth token (for Docker Hub)
-auth_response = requests.get(
-    f"https://auth.docker.io/token?service=registry.docker.io&scope=repository:{repo}:pull"
-)
-token = auth_response.json().get("token")
-headers = {"Authorization": f"Bearer {token}"}
-
-# Step 2: Get the manifest
-manifest_url = f"{registry_url}/{repo}/manifests/{tag}"
-response = requests.get(manifest_url, headers=headers)
-manifest = response.json()
-
-print("Layers to download:")
-for layer in manifest.get("layers", []):
-    print(layer["digest"])
+# Отображаем график
+plt.show()
